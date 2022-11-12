@@ -16,6 +16,7 @@
 		B5082FDF2917F36C00ADD6D6 /* LaunchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5082FDE2917F36C00ADD6D6 /* LaunchVC.swift */; };
 		B5082FE12917FC3600ADD6D6 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5082FE02917FC3600ADD6D6 /* TableViewCell.swift */; };
 		B5082FE3291814F400ADD6D6 /* LastViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5082FE2291814F400ADD6D6 /* LastViewController.swift */; };
+		B5121C31291FB58000980024 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5121C30291FB58000980024 /* Model.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		B5082FDE2917F36C00ADD6D6 /* LaunchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchVC.swift; sourceTree = "<group>"; };
 		B5082FE02917FC3600ADD6D6 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		B5082FE2291814F400ADD6D6 /* LastViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastViewController.swift; sourceTree = "<group>"; };
+		B5121C30291FB58000980024 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				B5082FD02917EAE100ADD6D6 /* Assets.xcassets */,
 				B5082FD22917EAE100ADD6D6 /* LaunchScreen.storyboard */,
 				B5082FD52917EAE100ADD6D6 /* Info.plist */,
+				B5121C30291FB58000980024 /* Model.swift */,
 			);
 			path = AppUseNewsApiJson;
 			sourceTree = "<group>";
@@ -151,6 +154,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5121C31291FB58000980024 /* Model.swift in Sources */,
 				B5082FE12917FC3600ADD6D6 /* TableViewCell.swift in Sources */,
 				B5082FCC2917EAE000ADD6D6 /* ViewController.swift in Sources */,
 				B5082FDF2917F36C00ADD6D6 /* LaunchVC.swift in Sources */,

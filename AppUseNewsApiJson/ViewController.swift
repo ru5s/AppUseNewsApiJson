@@ -10,6 +10,16 @@ import SkeletonView
 
 class ViewController: UIViewController {
     
+    var allNews: [NewsModel] = []
+    var allImages: [Data] = []
+    
+    let queue1 = DispatchQueue(label: "com.queue1", qos: .default, attributes: .concurrent)
+    let group1 = DispatchGroup()
+    
+    let queue2 = DispatchQueue(label: "com.queue2", qos: .default, attributes: .concurrent)
+    
+    let queue3 = DispatchQueue(label: "com.queue3", qos: .default, attributes: .concurrent)
+    
     var haveData: Bool = false
     
     let defaultUrl = URL(string: "https://1.bp.blogspot.com/--b7JV7PgDPo/Xj6jliViqZI/AAAAAAAAC60/NO3XtMYWHR00NPBc-a_wxlkszqLEB07QACLcBGAsYHQ/s1600/record.jpg")!
@@ -39,7 +49,7 @@ class ViewController: UIViewController {
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
         
-        
+        print(allNews.capacity)
     }
     
     @objc private func gestureDone(){
@@ -101,18 +111,20 @@ class ViewController: UIViewController {
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return allNews.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TableViewCell
         cell.backgroundColor = .clear
         
-//        DispatchQueue.main.sync {
-//            
-//            
-//            
-//        }
+        group1.wait()
+        DispatchQueue.main.async {
+            cell.name.text = self.allNews[indexPath.row].autor
+            cell.textField.text = self.allNews[indexPath.row].title
+
+
+        }
         
 //        cell.name.text = "Name"
 //        cell.date.text = Date().description
@@ -192,65 +204,79 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func getDataFromJson(){
         
-        let urlMy = URL(string: "https://newsapi.org/v2/everything?q=tesla&from=2022-10-08&sortBy=publishedAt&apiKey=ea9f3fd5e5ef4620b6797fdd0cc4d3ed&page=1")
+        let urlMy = URL(string: "https://newsapi.org/v2/everything?q=Apple&from=2022-11-12&sortBy=popularity&apiKey=ea9f3fd5e5ef4620b6797fdd0cc4d3ed&page=1")
         
-        guard let urlRequest = urlMy else { return }
-        var request = URLRequest(url: urlRequest)
-        
-        request.httpMethod = "GET"
-        let session = URLSession.shared
-        
-        let task = session.dataTask(with: request) { (data, response, error) in
+        group1.enter()
+        queue1.async(group: group1) {
+            guard let urlRequest = urlMy else { return }
+            var request = URLRequest(url: urlRequest)
             
-            do {
-                let json = try JSONSerialization.jsonObject(with: data!, options: [])
-                              guard let jsonData = json as? [String:Any] else { return }
-                              if let arrayNews = jsonData["articles"] as? NSArray {
-                 
-                                for news in arrayNews {
-                                  guard let currentNews = news as? [String:Any] else { return }
-                 
-                                  var currentTitle: String = "Without title"
-                                  if let title = currentNews["title"] as? String {
-                                    currentTitle = title
-                                  }
-                 
-                                  let datePublishedAt = currentNews["publishedAt"] as! String
-    //                              let convertedDate = self.dateConverter(datePublishedAt)
-                 
-                                  var currentAuthor: String = "Without author"
-                                  if let author = currentNews["author"] as? String {
-                                    currentAuthor = author
-                                  }
-                 
-                                  var currentDescription: String = "Without description"
-                                  if let description = currentNews["description"] as? String {
-                                    currentDescription = description
-                                  }
-                 
-                                  var currenURL: URL = self.defaultUrl
-                                  if let urlString = currentNews["url"] as? String {
-                                    currenURL = URL(string: urlString)!
-                                  }
-                 
-                                  var currentImageURL: URL = self.defaultUrl
-                                  if let imageString = currentNews["urlToImage"] as? String {
-                                    if imageString.isEmpty{
-                                      currentImageURL = self.defaultUrl
-                                    }else{
-                                      currentImageURL = URL(string: imageString) ?? self.defaultUrl
+            request.httpMethod = "GET"
+            let session = URLSession.shared
+            
+            let task = session.dataTask(with: request) { (data, response, error) in
+                
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data!, options: [])
+                                  guard let jsonData = json as? [String:Any] else { return }
+                                  if let arrayNews = jsonData["articles"] as? NSArray {
+                                      print(arrayNews.count)
+                                    for news in arrayNews {
+                                      guard let currentNews = news as? [String:Any] else { return }
+                     
+                                      var currentTitle: String = "Without title"
+                                      if let title = currentNews["title"] as? String {
+                                        currentTitle = title
+                                      }
+                     
+                                      let datePublishedAt = currentNews["publishedAt"] as! String
+        //                              let convertedDate = self.dateConverter(datePublishedAt)
+                     
+                                      var currentAuthor: String = "Without author"
+                                      if let author = currentNews["author"] as? String {
+                                        currentAuthor = author
+                                      }
+                     
+                                      var currentDescription: String = "Without description"
+                                      if let description = currentNews["description"] as? String {
+                                        currentDescription = description
+                                      }
+                     
+                                      var currenURL: URL = self.defaultUrl
+                                      if let urlString = currentNews["url"] as? String {
+                                        currenURL = URL(string: urlString)!
+                                      }
+                     
+                                      var currentImageURL: URL = self.defaultUrl
+                                      if let imageString = currentNews["urlToImage"] as? String {
+                                        if imageString.isEmpty{
+                                          currentImageURL = self.defaultUrl
+                                        }else{
+                                          currentImageURL = URL(string: imageString) ?? self.defaultUrl
+                                        }
+                                      }
+                                        let news = NewsModel(title: currentTitle, imageURL: currentImageURL, date: datePublishedAt, description: currentDescription, autor: currentAuthor, url: currenURL)
+                                        
+                                        self.allNews.append(news)
+//                                        print("current title - \(currentTitle)")
                                     }
+                                      
                                   }
-                                    print("current title - \(currentTitle)")
-                                }
-                              }
-            } catch {
-                print("error - \(error)")
+                    self.group1.leave()
+                    self.haveData == true
+                } catch {
+                    print("error - \(error)")
+                    self.group1.leave()
+                }
+                
+                
             }
-            
-            
+            task.resume()
         }
-        task.resume()
+        
+        
+        
+        
     }
     
 }
