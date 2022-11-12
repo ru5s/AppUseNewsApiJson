@@ -64,7 +64,7 @@ class TableViewCell: UITableViewCell {
         image.translatesAutoresizingMaskIntoConstraints = false
         image.isSkeletonable = true
         image.skeletonCornerRadius = 5
-        image.contentMode = .scaleToFill
+        image.contentMode = .scaleAspectFill
         image.clipsToBounds = true
         
         return image

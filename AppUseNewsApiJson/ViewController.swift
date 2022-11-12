@@ -44,21 +44,21 @@ class ViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        getDataFromJson()
+        
+        
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
         
-        print(allNews.capacity)
+        tableView.reloadData()
     }
     
-    @objc private func gestureDone(){
-        print("its work")
-    }
-
     override func viewDidLayoutSubviews() {
         let safeArea = view.layoutMarginsGuide
         print("data from didlayout \(haveData)")
+        
+        getDataFromJson()
+        
         if haveData == true {
             tableView.stopSkeletonAnimation()
         } else {
@@ -73,6 +73,7 @@ class ViewController: UIViewController {
                 self.tableView.reloadData()
             }
         }
+        
         
         
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
@@ -117,19 +118,16 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TableViewCell
         cell.backgroundColor = .clear
+//        haveData == false
         
         group1.wait()
+        
         DispatchQueue.main.async {
             cell.name.text = self.allNews[indexPath.row].autor
             cell.textField.text = self.allNews[indexPath.row].title
-
-
+            cell.imageOfCell.image = UIImage(data: self.allImages[indexPath.row])
+//            self.haveData == true
         }
-        
-//        cell.name.text = "Name"
-//        cell.date.text = Date().description
-//        cell.textField.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        cell.imageOfCell.image = UIImage(named: "launch logo")
         
         return cell
     }
@@ -177,10 +175,13 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         let lastVC = LastViewController()
         
-        lastVC.titleNews.text = "Title of news"
-        lastVC.autorsName.text = "Arthur Conan Doil"
-        lastVC.imageOfNews.image = UIImage(named: "launch logo")
-        lastVC.textField.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        DispatchQueue.main.async {
+            lastVC.titleNews.text = self.allNews[indexPath.row].title
+            lastVC.autorsName.text = self.allNews[indexPath.row].autor
+            lastVC.imageOfNews.image = UIImage(data: self.allImages[indexPath.row])
+            lastVC.textField.text = self.allNews[indexPath.row].description
+        }
+        
         
         lastVC.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(backBtn))
         lastVC.navigationItem.leftBarButtonItem?.tintColor = .white
@@ -204,7 +205,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func getDataFromJson(){
         
-        let urlMy = URL(string: "https://newsapi.org/v2/everything?q=Apple&from=2022-11-12&sortBy=popularity&apiKey=ea9f3fd5e5ef4620b6797fdd0cc4d3ed&page=1")
+        let urlMy = URL(string: "https://newsapi.org/v2/everything?q=Apple&from=2022-11-12&sortBy=popularity&apiKey=ea9f3fd5e5ef4620b6797fdd0cc4d3ed&page=2")
         
         group1.enter()
         queue1.async(group: group1) {
@@ -262,21 +263,42 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                                     }
                                       
                                   }
-                    self.group1.leave()
-                    self.haveData == true
+//                    self.group1.leave()
+//                    self.haveData == true
                 } catch {
                     print("error - \(error)")
                     self.group1.leave()
                 }
-                
-                
+                self.getImageData(array: self.allNews)
+                self.group1.leave()
             }
             task.resume()
         }
-        
-        
-        
-        
+    }
+    
+    func getImageData(array: [NewsModel]) {
+        group1.enter()
+        queue2.async(group: group1) {
+            for news in array {
+                self.queue3.async {
+                    do {
+                        if let data = try? Data(contentsOf: news.imageURL) {
+                            self.allImages.append(data)
+                        } else {
+                            let defaultUrl = self.defaultUrl
+                            let data = try! Data(contentsOf: self.defaultUrl)
+                            
+                            
+                            self.allImages.append(data)
+                        }
+                    }
+                }
+                
+                
+            }
+            
+        }
+        group1.leave()
     }
     
 }

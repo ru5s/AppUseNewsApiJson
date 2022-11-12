@@ -16,6 +16,7 @@ class LastViewController: UIViewController {
         label.textColor = .white
         label.font = UIFont(name: "Helvetica", size: 22)
         label.textAlignment = .center
+        label.numberOfLines = 3
         
         return label
     }()
@@ -80,7 +81,7 @@ class LastViewController: UIViewController {
         
         titleNews.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 0).isActive = true
         titleNews.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
+        titleNews.widthAnchor.constraint(equalToConstant: view.bounds.width - 40).isActive = true
         imageOfNews.topAnchor.constraint(equalTo: titleNews.bottomAnchor, constant: 10).isActive = true
         imageOfNews.widthAnchor.constraint(equalToConstant: view.bounds.width).isActive = true
         imageOfNews.heightAnchor.constraint(equalToConstant: 250).isActive = true
